@@ -1,10 +1,14 @@
+import { crawlPage } from './crawl.js'
+
 const main = () => {
   if (process.argv.length < 3) {
-    throw Error('URL was not provided')
+    throw new Error('URL was not provided')
   } else if (process.argv.length > 3) {
-    throw Error('Too many arguments provided')
+    throw new Error('Too many arguments provided')
   }
-  console.log(`Crawler started at ${process.argv[2]}`)
+  const url = process.argv[2]
+  console.log(`Crawler started at ${url}`)
+  crawlPage(url)
 }
 
 main()

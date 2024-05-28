@@ -1,5 +1,23 @@
 import { JSDOM } from 'jsdom'
 
+const crawlPage = async (url) => {
+  try {
+    const response = await fetch(url)
+    if (response.status >= 400) {
+      console.log(`${response.status} ${response.statusText}`)
+      return
+    }
+    const contentType = response.headers.get('Content-Type')
+    if (!contentType || !contentType.includes('text/html')) {
+      console.log('Response was not HTML')
+      return
+    }
+    console.log(await response.text())
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 const getURLsFromHTML = (html, baseURL) => {
   const url_list = []
   const dom = new JSDOM(html)
@@ -24,4 +42,4 @@ const normalizeURL = (url) => {
   return `${urlObj.hostname}${urlObj.pathname}`
 }
 
-export { getURLsFromHTML, normalizeURL }
+export { crawlPage, getURLsFromHTML, normalizeURL }
