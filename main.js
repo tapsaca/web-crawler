@@ -8,7 +8,8 @@ const main = () => {
   }
   const url = process.argv[2]
   console.log(`Crawler started at ${url}`)
-  crawlPage(url)
+  const pages = crawlPage(url)
+  console.log(pages)
 }
 
 main()

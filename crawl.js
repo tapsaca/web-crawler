@@ -1,6 +1,26 @@
 import { JSDOM } from 'jsdom'
 
-const crawlPage = async (url) => {
+const crawlPage = async (baseURL, currentURL = baseURL, pages = {}) => {
+  // Return if currentURL is not on the same domain
+  if (new URL(baseURL).hostname != new URL(currentURL).hostname) {
+    return pages
+  }
+  const normalizedURL = normalizeURL(currentURL)
+  if (pages.hasOwnProperty(normalizedURL)) {
+    pages[normalizedURL]++
+    return pages
+  }
+  pages[normalizedURL] = 1
+  console.log(`Crawling ${currentURL}`)
+  const html = await fetchHTML(currentURL)
+  const nextURLs = getURLsFromHTML(html, currentURL)
+  for (const nextURL of nextURLs) {
+    pages = crawlPage(baseURL, nextURL, pages)
+  }
+  return pages
+}
+
+const fetchHTML = async (url) => {
   try {
     const response = await fetch(url)
     if (response.status >= 400) {
@@ -12,26 +32,26 @@ const crawlPage = async (url) => {
       console.log('Response was not HTML')
       return
     }
-    console.log(await response.text())
+    return response.text()
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
 const getURLsFromHTML = (html, baseURL) => {
-  const url_list = []
+  const URLs = []
   const dom = new JSDOM(html)
   const anchors = dom.window.document.querySelectorAll('a')
   for (const anchor of anchors) {
     if (anchor.hasAttribute('href')) {
       try {
-        url_list.push(new URL(anchor.getAttribute('href'), baseURL).href)
+        URLs.push(new URL(anchor.getAttribute('href'), baseURL).href)
       } catch (error) {
         console.log(error.message)
       }
     }
   }
-  return url_list
+  return URLs
 }
 
 const normalizeURL = (url) => {
