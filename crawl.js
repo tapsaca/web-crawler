@@ -12,10 +12,15 @@ const crawlPage = async (baseURL, currentURL = baseURL, pages = {}) => {
   }
   pages[normalizedURL] = 1
   console.log(`Crawling ${currentURL}`)
-  const html = await fetchHTML(currentURL)
-  const nextURLs = getURLsFromHTML(html, currentURL)
-  for (const nextURL of nextURLs) {
-    pages = crawlPage(baseURL, nextURL, pages)
+  try {
+    const html = await fetchHTML(currentURL)
+    const nextURLs = getURLsFromHTML(html, baseURL)
+    for (const nextURL of nextURLs) {
+      pages = await crawlPage(baseURL, nextURL, pages)
+    }
+  } catch (error) {
+    console.log(error.message)
+    return pages
   }
   return pages
 }

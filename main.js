@@ -1,6 +1,6 @@
 import { crawlPage } from './crawl.js'
 
-const main = () => {
+const main = async () => {
   if (process.argv.length < 3) {
     throw new Error('URL was not provided')
   } else if (process.argv.length > 3) {
@@ -8,7 +8,7 @@ const main = () => {
   }
   const url = process.argv[2]
   console.log(`Crawler started at ${url}`)
-  const pages = crawlPage(url)
+  const pages = await crawlPage(url)
   console.log(pages)
 }
 
